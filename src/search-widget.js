@@ -37,7 +37,7 @@
               Keywords
             </search-widget-tab>
             <search-widget-panel role="region" slot="panel">
-              Keyword Search here...
+              <keyword-query />
             </search-widget-panel>
           </search-widget>
 
@@ -326,7 +326,6 @@
     }
 
     _onClick(text) {
-      const rawText = this.querySelector('#gene-text').value
       console.log('Start Search: ', text)
 
       if(text !== undefined && text !== null && text.length !== 0) {
@@ -339,5 +338,120 @@
   }
   
   customElements.define("gene-list-query", GeneListQuery);
+
+
+  // const NDEX_URL = 'http://www.ndexbio.org/#/search?searchType=All&searchString=brca1&searchTermExpansion=false'
+  const NDEX_URL = 'http://www.ndexbio.org/#/search?searchType=All&searchTermExpansion=false&searchString='
+  class KeywordQuery extends HTMLElement {
+    constructor() {
+      super();
+      
+      this.innerHTML = `
+        <div class="keyword-panel">
+          <div class="button-panel">
+            <button id="browse-button" class="button keyword-button">Browse</button>
+            <button id="featured-button" class="button keyword-button">Featured Networks</button>
+            <button id="sample-button" class="button keyword-button">Search Examples</button>
+            <drop-down-list></drop-down-list>
+          </div>
+          
+          <div class="query-box">
+            <input id="keyword-text" placeholder="Enter gene list..."></input>
+            <button id="run-keyword-button" class="button">Run</button>
+          </div>
+        </div>`
+      
+        const keywordPanel = this.querySelector('.keyword-panel')
+        keywordPanel.style.display = 'flex'
+        keywordPanel.style.height = '100%'
+        keywordPanel.style.width = '100%'
+        keywordPanel.style.flexDirection = 'row'
+        
+        const query = this.querySelector('.query-box')
+        query.style.display = 'flex'
+        query.style.height = '100%'
+        query.style.width = '80%'
+        query.style.width = '80%'
+        query.style.alignItems = 'center'
+        query.style.justifyContent = 'center'
+
+        const keywordText = this.querySelector('#keyword-text')
+        keywordText.style.border = 'none'
+        keywordText.style.width = '100%'
+        keywordText.style.height = '3em'
+        keywordText.style.padding = '0'
+        keywordText.style.resize = 'none'
+        
+        
+        const buttonPanel = this.querySelector('.button-panel')
+        buttonPanel.style.height = '100%'
+        buttonPanel.style.width = '20%'
+        buttonPanel.style.background = '#F5F5F5'
+        buttonPanel.style.display = 'flex'
+        buttonPanel.style.alignItems = 'center'
+        buttonPanel.style.justifyContent = 'space-around'
+        buttonPanel.style.flexDirection = 'column'
+        
+        const keywordButtons = this.querySelectorAll('.keyword-button')
+
+        keywordButtons.forEach(button => {
+          button.style.background = '#286090'
+          button.style.fontSize = '0.7em'
+          button.style.width = '12em'
+          button.style.height = '3em'
+        })
+        
+        const runButton = this.querySelector('#run-keyword-button')
+        runButton.style.background = 'orange'
+        runButton.style.height = '2.5em'
+        runButton.addEventListener('click', () => this._onClick(keywordText.value, 'run'))
+        
+        const browseButton = this.querySelector('#browse-button')
+        browseButton.addEventListener('click', () => this._onClick(keywordText.value, 'browse'))
+    }
+
+    _onClick(text, command) {
+      console.log('keyword Search: ', text)
+      let url = NDEX_URL
+      if(command === 'browse') {
+        url = url + '*'
+        window.open(url, '_blank')
+        return
+      }
+
+      if(text !== undefined && text !== null && text.length !== 0) {
+
+        if(command === 'run') {
+          url = NDEX_URL + text
+
+        }
+      } else {
+        return        
+      }
+      
+      window.open(url, '_blank')
+
+    }
+
+  }
+  
+  customElements.define("keyword-query", KeywordQuery);
+
+  class DropDownList extends HTMLElement {
+    constructor() {
+      super();
+      const shadow = this.attachShadow({ mode: 'open' });
+      const listContainer = document.createElement('div');
+      
+      const listItems = this.items;
+      listContainer.classList.add('drop-list');
+      shadow.appendChild(listContainer);
+    }
+
+
+  }
+  
+  customElements.define("drop-down-list", DropDownList);
+
 
 })();
